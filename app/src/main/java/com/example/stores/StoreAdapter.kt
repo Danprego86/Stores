@@ -1,5 +1,6 @@
 package com.example.stores
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -33,8 +34,16 @@ class StoreAdapter(private var stores: MutableList<StoreEntity>,
 
     override fun getItemCount(): Int = stores.size
 
+    @SuppressLint("NotifyDataSetChanged")
     fun add(storeEntity: StoreEntity) {
         stores.add(storeEntity)
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setStores(stores: MutableList<StoreEntity>) {
+
+        this.stores = stores
         notifyDataSetChanged()
     }
 
