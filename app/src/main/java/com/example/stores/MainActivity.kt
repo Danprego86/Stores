@@ -61,11 +61,11 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     }
 
     // OnclickLisener
-    override fun onClick(storeEntity: StoreEntity) {
+    override fun onClick(storeEntity: StoreEntity){
 
     }
 
-    override fun onDeleteStore(storeEntity: StoreEntity) {
+    override fun onDeleteStore(storeEntity: StoreEntity){
         val queue= LinkedBlockingQueue<StoreEntity>()
 
         Thread{
