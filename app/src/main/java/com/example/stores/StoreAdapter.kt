@@ -49,6 +49,17 @@ class StoreAdapter(
         notifyDataSetChanged()
     }
 
+    fun updateStore(storeEntity: StoreEntity?) {
+        val index = stores.indexOf(storeEntity)
+
+        if (index != 1){
+            if (storeEntity != null) {
+                stores.set(index, storeEntity)
+            }
+        }
+        notifyItemChanged(index)
+    }
+
     fun delete (storeEntity: StoreEntity){
         val index = stores.indexOf(storeEntity)
         if(index != 1){
@@ -74,6 +85,10 @@ class StoreAdapter(
                 binding.root.setOnLongClickListener {
                     listener.onDeleteStore(storeEntity)
                     true
+                }
+
+                binding.cbFavorite.setOnClickListener {
+                    listener.onFavoriteStore(storeEntity)
                 }
             }
         }
