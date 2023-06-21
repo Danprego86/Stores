@@ -65,5 +65,14 @@ class MainActivity : AppCompatActivity(), OnClickListener {
 
     }
 
+    override fun onDeleteStore(storeEntity: StoreEntity) {
+        val queue= LinkedBlockingQueue<StoreEntity>()
+
+        Thread{
+            StoreApplication.database.storeDao().deleteStore(storeEntity)
+            queue.add(storeEntity)
+        }.start()
+        mAdapter.delete(queue.take())
+    }
 }
 

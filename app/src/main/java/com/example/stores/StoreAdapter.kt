@@ -8,8 +8,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.stores.databinding.ItemStoreBinding
 
-class StoreAdapter(private var stores: MutableList<StoreEntity>,
-                   private  var listener:OnClickListener):RecyclerView.Adapter<StoreAdapter.ViewHolder>() {
+class StoreAdapter(
+    private var stores: MutableList<StoreEntity>,
+    private var listener: OnClickListener
+) : RecyclerView.Adapter<StoreAdapter.ViewHolder>() {
 
     private lateinit var mContext: Context
 
@@ -26,7 +28,7 @@ class StoreAdapter(private var stores: MutableList<StoreEntity>,
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val store = stores.get(position)
 
-        with(holder){
+        with(holder) {
             setListener(store)
             binding.tvName.text = store.name
         }
@@ -47,14 +49,33 @@ class StoreAdapter(private var stores: MutableList<StoreEntity>,
         notifyDataSetChanged()
     }
 
+    fun delete (storeEntity: StoreEntity){
+        val index = stores.indexOf(storeEntity)
+        if(index != 1){
+            stores.removeAt(index)
+            notifyItemRemoved(index)
+        }
+
+    }
+
     //Class Inner
-    inner class ViewHolder(view:View): RecyclerView.ViewHolder(view){
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         val binding = ItemStoreBinding.bind(view)
 
-        fun setListener (storeEntity:StoreEntity){
+        fun setListener(storeEntity: StoreEntity) {
 
-            binding.root.setOnClickListener { listener.onClick(storeEntity) }
+            with(binding.root) {
+
+                binding.root.setOnClickListener {
+                    listener.onClick(storeEntity)
+                }
+
+                binding.root.setOnLongClickListener {
+                    listener.onDeleteStore(storeEntity)
+                    true
+                }
+            }
         }
     }
 }

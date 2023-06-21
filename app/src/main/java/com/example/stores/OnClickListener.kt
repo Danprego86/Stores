@@ -4,4 +4,5 @@ interface OnClickListener {
 
     fun onClick(storeEntity: StoreEntity)
 
+    fun onDeleteStore(storeEntity: StoreEntity)
 }
