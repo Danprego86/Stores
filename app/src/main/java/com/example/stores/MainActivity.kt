@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
 
     }
 
-
+    @SuppressLint("SuspiciousIndentation")
     private fun getStore(){
 
        val queue = LinkedBlockingQueue<MutableList<StoreEntity>>()

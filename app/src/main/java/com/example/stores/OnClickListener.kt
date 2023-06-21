@@ -4,5 +4,4 @@ interface OnClickListener {
 
     fun onClick(storeEntity: StoreEntity)
 
-
 }
