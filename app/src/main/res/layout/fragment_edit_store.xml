@@ -82,19 +82,27 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content">
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPhotoUrl"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:maxLines="@integer/liner_url_photo"
+                    android:minLines="@integer/liner_url_photo"
+                    android:inputType="textMultiLine"/>
+
             </com.google.android.material.textfield.TextInputLayout>
-            
+
             <ImageView
-                android:id="@+id/imagePhoto"
+                android:id="@+id/imgPhoto"
                 android:layout_width="@dimen/photo_size_thumb"
                 android:layout_height="@dimen/photo_size_thumb"
-                android:src="@drawable/image"/>
-         </LinearLayout>
+                android:src="@drawable/image"
+                android:contentDescription="@string/description_img_photo"
+                android:layout_marginStart="@dimen/common_padding_default"/>
+        </LinearLayout>
 
     </LinearLayout>
-
 </androidx.core.widget.NestedScrollView>
