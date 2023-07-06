@@ -73,36 +73,39 @@
                 android:inputType="textMultiLine"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="@dimen/common_padding_default"
-            android:gravity="center_vertical"/>
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="horizontal"
+           android:layout_marginTop="@dimen/common_padding_default"
+           android:gravity="center_vertical">
+           <com.google.android.material.textfield.TextInputLayout
+               android:layout_width="0dp"
+               android:layout_height="wrap_content"
+               android:layout_weight="1"
+               android:hint="@string/hint_photo_url"
+               app:endIconMode="clear_text"
+               app:startIconDrawable="@drawable/link"
+               style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+               <com.google.android.material.textfield.TextInputEditText
+                   android:id="@+id/etPhotoUrl"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:textAppearance="?attr/textAppearanceCaption"
+                   android:textColor="@color/color_link"
+                   android:maxLines="@integer/liner_url_photo"
+                   android:minLines="@integer/liner_url_photo"
+                   android:inputType="textMultiLine"/>
+           </com.google.android.material.textfield.TextInputLayout>
+           
+           <ImageView
+               android:layout_width="@dimen/photo_size_thumb"
+               android:layout_height="@dimen/photo_size_thumb"
+               android:src="@drawable/image"
+               android:layout_marginStart="@dimen/common_padding_default"
+               android:contentDescription="@string/description_img_photo"/>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etPhotoUrl"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxLines="@integer/liner_url_photo"
-                    android:minLines="@integer/liner_url_photo"
-                    android:inputType="textMultiLine"/>
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <ImageView
-                android:id="@+id/imgPhoto"
-                android:layout_width="@dimen/photo_size_thumb"
-                android:layout_height="@dimen/photo_size_thumb"
-                android:src="@drawable/image"
-                android:contentDescription="@string/description_img_photo"
-                android:layout_marginStart="@dimen/common_padding_default"/>
-        </LinearLayout>
+       </LinearLayout>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
