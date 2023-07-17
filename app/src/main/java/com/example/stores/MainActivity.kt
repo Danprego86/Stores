@@ -1,10 +1,11 @@
 package com.example.stores
 
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.stores.databinding.ActivityMainBinding
+import com.google.android.material.internal.ContextUtils.getActivity
 import java.util.concurrent.LinkedBlockingQueue
 import kotlin.concurrent.thread
 
@@ -19,18 +20,32 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         mbinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mbinding.root)
 
-        mbinding.btnSave.setOnClickListener {
 
-            val store = StoreEntity(name = mbinding.etName.text.toString().trim())
+         mbinding.btnSave.setOnClickListener {
 
-            Thread {
-                StoreApplication.database.storeDao().addStore(store)
-            }.start()
+             val store = StoreEntity(name = mbinding.etName.text.toString().trim())
 
-            mAdapter.add(store)
-        }
+             Thread {
+                 StoreApplication.database.storeDao().addStore(store)
+             }.start()
 
+             mAdapter.add(store)
+         }
+
+         mbinding.fab.setOnClickListener { launchEditFragment() }
         setupRecyclerView()
+    }
+
+
+    @SuppressLint("CommitTransaction")
+    private fun launchEditFragment() {
+        val fragment:EditStoreFragment = EditStoreFragment()// Se instancia la clase EditStoreFragment
+        val fragmentManager = supportFragmentManager // Es el que controla los fragmentos
+        val fragmentTransaction = fragmentManager.beginTransaction() //Indica como se va a realizar
+        fragmentTransaction.add(R.id.containerMain, fragment)
+        fragmentTransaction.addToBackStack(null)
+        fragmentTransaction.commit()// Para que se apliquen los cambios.
+        mbinding.fab.hide()//Oculta el fragmentActionBottom
     }
 
     private fun setupRecyclerView() {
@@ -43,7 +58,6 @@ class MainActivity : AppCompatActivity(), OnClickListener {
             layoutManager = mGridLayout
             adapter = mAdapter
         }
-
     }
 
     @SuppressLint("SuspiciousIndentation")
@@ -81,7 +95,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         Thread {
             StoreApplication.database.storeDao().deleteStore(storeEntity)
             queue.add(storeEntity)
-        }.start()
+        }
         mAdapter.delete(queue.take())
     }
 }
