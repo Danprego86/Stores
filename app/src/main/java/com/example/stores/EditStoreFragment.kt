@@ -28,7 +28,7 @@ class EditStoreFragment : Fragment() {
 
 
         val activity = activity as?  MainActivity
-        activity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        activity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)// Se habilita flecha de retroceso
     }
 
 

@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         setContentView(mbinding.root)
 
 
-         mbinding.btnSave.setOnClickListener {
+        /* mbinding.btnSave.setOnClickListener {
 
              val store = StoreEntity(name = mbinding.etName.text.toString().trim())
 
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
              }.start()
 
              mAdapter.add(store)
-         }
+         }*/
 
          mbinding.fab.setOnClickListener { launchEditFragment() }
         setupRecyclerView()
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         val fragmentManager = supportFragmentManager // Es el que controla los fragmentos
         val fragmentTransaction = fragmentManager.beginTransaction() //Indica como se va a realizar
         fragmentTransaction.add(R.id.containerMain, fragment)
-        fragmentTransaction.addToBackStack(null)
+        fragmentTransaction.addToBackStack(null)// se indica que devuelve a la pantalla anterior de la app
         fragmentTransaction.commit()// Para que se apliquen los cambios.
         mbinding.fab.hide()//Oculta el fragmentActionBottom
     }
