@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="70dp"
+        android:paddingTop="16dp"
         android:layout_marginStart="@dimen/common_padding_default"
         android:layout_marginEnd="@dimen/common_padding_default">
 
@@ -75,7 +75,7 @@
                 android:textColor="@color/color_link"
                 android:maxLines="@integer/lines_url_website"
                 android:minLines="@integer/lines_url_website"
-                android:inputType="textMultiLine"/>
+                android:inputType="textMultiLine" />
         </com.google.android.material.textfield.TextInputLayout>
 
        <LinearLayout

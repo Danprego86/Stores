@@ -9,7 +9,7 @@ import com.google.android.material.internal.ContextUtils.getActivity
 import java.util.concurrent.LinkedBlockingQueue
 import kotlin.concurrent.thread
 
-class MainActivity : AppCompatActivity(), OnClickListener {
+class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
 
     private lateinit var mbinding: ActivityMainBinding
     private lateinit var mAdapter: StoreAdapter
@@ -32,20 +32,21 @@ class MainActivity : AppCompatActivity(), OnClickListener {
              mAdapter.add(store)
          }*/
 
-         mbinding.fab.setOnClickListener { launchEditFragment() }
+        mbinding.fab.setOnClickListener { launchEditFragment() }
         setupRecyclerView()
     }
 
 
     @SuppressLint("CommitTransaction")
     private fun launchEditFragment() {
-        val fragment:EditStoreFragment = EditStoreFragment()// Se instancia la clase EditStoreFragment
+        val fragment = EditStoreFragment()// Se instancia la clase EditStoreFragment
         val fragmentManager = supportFragmentManager // Es el que controla los fragmentos
         val fragmentTransaction = fragmentManager.beginTransaction() //Indica como se va a realizar
         fragmentTransaction.add(R.id.containerMain, fragment)
         fragmentTransaction.addToBackStack(null)// se indica que devuelve a la pantalla anterior de la app
         fragmentTransaction.commit()// Para que se apliquen los cambios.
-        mbinding.fab.hide()//Oculta el fragmentActionBottom
+       // mbinding.fab.hide()//Oculta el fragmentActionBottom
+        hideFab()
     }
 
     private fun setupRecyclerView() {
@@ -97,6 +98,14 @@ class MainActivity : AppCompatActivity(), OnClickListener {
             queue.add(storeEntity)
         }
         mAdapter.delete(queue.take())
+    }
+
+    override fun hideFab(isVisible: Boolean) {
+        if (isVisible)
+            mbinding.fab.show()
+        else {
+            mbinding.fab.hide()
+        }
     }
 }
 

@@ -18,9 +18,7 @@ class StoreAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         //Inflar la vista
         mContext = parent.context
-
         val view = LayoutInflater.from(mContext).inflate(R.layout.item_store, parent, false)
-
         return ViewHolder(view)
     }
 
