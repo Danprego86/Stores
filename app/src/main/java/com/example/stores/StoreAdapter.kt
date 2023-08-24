@@ -60,7 +60,7 @@ class StoreAdapter(
 
     fun delete (storeEntity: StoreEntity){
         val index = stores.indexOf(storeEntity)
-        if(index != 1){
+        if(index != -1){
             stores.removeAt(index)
             notifyItemRemoved(index)
         }
@@ -76,16 +76,16 @@ class StoreAdapter(
 
             with(binding.root) {
 
-                binding.root.setOnClickListener {
+                setOnClickListener {
                     listener.onClick(storeEntity)
                 }
 
-                binding.root.setOnLongClickListener {
+                setOnLongClickListener {
                     listener.onDeleteStore(storeEntity)
                     true
                 }
 
-                binding.cbFavorite.setOnClickListener {
+                setOnClickListener {
                     listener.onFavoriteStore(storeEntity)
                 }
             }

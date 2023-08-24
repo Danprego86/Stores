@@ -21,16 +21,16 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
         setContentView(mbinding.root)
 
 
-        /* mbinding.btnSave.setOnClickListener {
-
-             val store = StoreEntity(name = mbinding.etName.text.toString().trim())
-
-             Thread {
-                 StoreApplication.database.storeDao().addStore(store)
-             }.start()
-
-             mAdapter.add(store)
-         }*/
+//         mbinding.btnSave.setOnClickListener {
+//
+//             val store = StoreEntity(name = mbinding.etName.text.toString().trim())
+//
+//             Thread {
+//                 StoreApplication.database.storeDao().addStore(store)
+//             }.start()
+//
+//             mAdapter.add(store)
+//         }
 
         mbinding.fab.setOnClickListener { launchEditFragment() }
         setupRecyclerView()
@@ -91,13 +91,13 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
 
 
     override fun onDeleteStore(storeEntity: StoreEntity) {
-        val queue = LinkedBlockingQueue<StoreEntity>()
+        val queue = LinkedBlockingQueue<StoreEntity>()// Se crea un cola
 
         Thread {
             StoreApplication.database.storeDao().deleteStore(storeEntity)
             queue.add(storeEntity)
         }
-        mAdapter.delete(queue.take())
+        mAdapter.delete(storeEntity)// Se pasa al adaptador la tienda a eliminar
     }
 
     override fun hideFab(isVisible: Boolean) {
@@ -106,6 +106,15 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
         else {
             mbinding.fab.hide()
         }
+    }
+
+    override fun addStore(storeEntity: StoreEntity) {// indica al adaptador la nueva tienda añadida
+        mAdapter.add(storeEntity)
+
+    }
+
+    override fun updateStore(storeEntity: StoreEntity) {
+
     }
 }
 

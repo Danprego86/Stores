@@ -1,6 +1,7 @@
 package com.example.stores
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import com.example.stores.databinding.FragmentEditStoreBinding
 import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.LinkedBlockingQueue
@@ -55,22 +57,23 @@ class EditStoreFragment : Fragment() {
                     webSite = mBinding.etWebsite.text.toString().trim()
                 )
 
-                val queue = LinkedBlockingQueue<Long>()
+                val queue = LinkedBlockingQueue<Long?>()
 
                 Thread {
                     val id = StoreApplication.database.storeDao().addStore(store)
                     queue.add(id)
                 }.start()
 
-                with(queue.take()) {
+                queue.take().let {
 
-                    Snackbar.make(
-                        mBinding.root,
+                    mActivity?.addStore(store)// indica al Main Activity la nueva tienda
+                    hideKeyboard()
+                    Snackbar.make(mBinding.root,
                         getString(
                             R.string.edit_store_message_save_succes),
-                            Snackbar.LENGTH_SHORT
-                    )
-                        .show()
+                            Snackbar.LENGTH_SHORT)
+                            .show()
+                    mActivity?.onBackPressedDispatcher?.onBackPressed()// Despues de guardar la tienda regresa al home
                 }
                 true
             }
@@ -79,10 +82,20 @@ class EditStoreFragment : Fragment() {
         }
     }
 
+    override fun onDestroyView() {//Metodo para ocultar teclado cuando retrocedemos con la flecha
+        hideKeyboard()
+        super.onDestroyView()
+    }
+
+    private fun hideKeyboard() {//Metodo para ocultar teclado cuando se guarda una tienda
+
+        val imm = mActivity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(requireView().windowToken, 0)
+    }
+
     override fun onDestroy() {
         mActivity?.supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        mActivity?.supportActionBar?.title =
-            getString(R.string.app_name)//Indicamos volver a mostrar el nombre de la app
+        mActivity?.supportActionBar?.title = getString(R.string.app_name)//Indicamos volver a mostrar el nombre de la app
         mActivity?.hideFab(true)
         setHasOptionsMenu(false)
         super.onDestroy()
