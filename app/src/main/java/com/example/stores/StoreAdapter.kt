@@ -29,6 +29,7 @@ class StoreAdapter(
         with(holder) {
             setListener(store)
             binding.tvName.text = store.name
+            binding.cbFavorite.isChecked = store.isFavorite
         }
     }
 
@@ -36,8 +37,12 @@ class StoreAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun add(storeEntity: StoreEntity) {
-        stores.add(storeEntity)
-        notifyDataSetChanged()
+
+        if (!stores.contains(storeEntity)){ // validacion de si una tienda ya existe
+
+            stores.add(storeEntity)
+            notifyItemInserted(stores.size-1)//Valida el elemento ingresado con el de la ultima posicion
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -50,17 +55,17 @@ class StoreAdapter(
     fun updateStore(storeEntity: StoreEntity?) {
         val index = stores.indexOf(storeEntity)
 
-        if (index != 1){
+        if (index != -1) {
             if (storeEntity != null) {
-                stores.set(index, storeEntity)
+                stores[index] = storeEntity
+                notifyItemChanged(index)
             }
         }
-        notifyItemChanged(index)
     }
 
-    fun delete (storeEntity: StoreEntity){
+    fun delete(storeEntity: StoreEntity) {
         val index = stores.indexOf(storeEntity)
-        if(index != -1){
+        if (index != -1) {
             stores.removeAt(index)
             notifyItemRemoved(index)
         }
@@ -84,10 +89,10 @@ class StoreAdapter(
                     listener.onDeleteStore(storeEntity)
                     true
                 }
+            }
 
-                setOnClickListener {
-                    listener.onFavoriteStore(storeEntity)
-                }
+            binding.cbFavorite.setOnClickListener {
+                listener.onFavoriteStore(storeEntity)
             }
         }
     }

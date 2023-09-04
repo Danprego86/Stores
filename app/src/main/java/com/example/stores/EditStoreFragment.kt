@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import com.example.stores.databinding.FragmentEditStoreBinding
 import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.LinkedBlockingQueue
@@ -60,19 +61,25 @@ class EditStoreFragment : Fragment() {
                 val queue = LinkedBlockingQueue<Long?>()
 
                 Thread {
-                    val id = StoreApplication.database.storeDao().addStore(store)
-                    queue.add(id)
+                    store.id = StoreApplication.database.storeDao()
+                        .addStore(store)// se añade eñ "store.id" para notificar los cambios de favoritos
+                    queue.add(store.id)
                 }.start()
 
                 queue.take().let {
 
                     mActivity?.addStore(store)// indica al Main Activity la nueva tienda
                     hideKeyboard()
-                    Snackbar.make(mBinding.root,
-                        getString(
-                            R.string.edit_store_message_save_succes),
-                            Snackbar.LENGTH_SHORT)
-                            .show()
+//                    Snackbar.make(mBinding.root,
+//                        getString(
+//                            R.string.edit_store_message_save_succes),
+//                            Snackbar.LENGTH_SHORT)
+//                            .show()
+                    Toast.makeText(
+                        mActivity,
+                        R.string.edit_store_message_save_succes,
+                        Toast.LENGTH_SHORT
+                    ).show()
                     mActivity?.onBackPressedDispatcher?.onBackPressed()// Despues de guardar la tienda regresa al home
                 }
                 true
@@ -95,7 +102,8 @@ class EditStoreFragment : Fragment() {
 
     override fun onDestroy() {
         mActivity?.supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        mActivity?.supportActionBar?.title = getString(R.string.app_name)//Indicamos volver a mostrar el nombre de la app
+        mActivity?.supportActionBar?.title =
+            getString(R.string.app_name)//Indicamos volver a mostrar el nombre de la app
         mActivity?.hideFab(true)
         setHasOptionsMenu(false)
         super.onDestroy()

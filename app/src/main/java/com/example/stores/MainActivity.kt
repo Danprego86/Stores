@@ -96,8 +96,8 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
         Thread {
             StoreApplication.database.storeDao().deleteStore(storeEntity)
             queue.add(storeEntity)
-        }
-        mAdapter.delete(storeEntity)// Se pasa al adaptador la tienda a eliminar
+        }.start()
+        mAdapter.delete(queue.take())// Se pasa al adaptador la tienda a eliminar
     }
 
     override fun hideFab(isVisible: Boolean) {
