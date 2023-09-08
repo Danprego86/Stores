@@ -12,6 +12,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.stores.databinding.FragmentEditStoreBinding
 import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.LinkedBlockingQueue
@@ -37,6 +40,14 @@ class EditStoreFragment : Fragment() {
             getString(R.string.edit_store_title_add)// Se cambia el titulo de la tienda en el segundo fragment
 
         setHasOptionsMenu(true)//Tener acceso al menu
+
+        mBinding.etPhotoUrl.addTextChangedListener {
+            Glide.with(this)
+                .load(mBinding.etPhotoUrl.text.toString())
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .centerCrop()
+                .into(mBinding.imgPhoto)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -55,7 +66,8 @@ class EditStoreFragment : Fragment() {
                 val store = StoreEntity(
                     name = mBinding.etName.text.toString().trim(),
                     phone = mBinding.etPhone.text.toString().trim(),
-                    webSite = mBinding.etWebsite.text.toString().trim()
+                    webSite = mBinding.etWebsite.text.toString().trim(),
+                    photoUrl = mBinding.etPhotoUrl.text.toString().trim()
                 )
 
                 val queue = LinkedBlockingQueue<Long?>()
