@@ -34,6 +34,14 @@ class EditStoreFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val id = arguments?.getLong(getString(R.string.arg_id), 0)
+
+        if (id != null && id != 0L){
+            Toast.makeText(activity, id.toString(), Toast.LENGTH_SHORT).show()
+        }else{
+            Toast.makeText(activity, id.toString(), Toast.LENGTH_SHORT).show()
+        }
+
         mActivity = activity as? MainActivity
         mActivity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)// Se habilita flecha de retroceso
         mActivity?.supportActionBar?.title =

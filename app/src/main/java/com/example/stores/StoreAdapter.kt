@@ -90,7 +90,7 @@ class StoreAdapter(
             with(binding.root) {
 
                 setOnClickListener {
-                    listener.onClick(storeEntity)
+                    listener.onClick(storeEntity.id)
                 }
 
                 setOnLongClickListener {

@@ -38,15 +38,18 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
 
 
     @SuppressLint("CommitTransaction")
-    private fun launchEditFragment() {
+    private fun launchEditFragment(args : Bundle? = null) {
         val fragment = EditStoreFragment()// Se instancia la clase EditStoreFragment
+
+        if (args != null){ fragment.arguments = args }
+
         val fragmentManager = supportFragmentManager // Es el que controla los fragmentos
         val fragmentTransaction = fragmentManager.beginTransaction() //Indica como se va a realizar
         fragmentTransaction.add(R.id.containerMain, fragment)
         fragmentTransaction.addToBackStack(null)// se indica que devuelve a la pantalla anterior de la app
         fragmentTransaction.commit()// Para que se apliquen los cambios.
-       // mbinding.fab.hide()//Oculta el fragmentActionBottom
-        hideFab()
+
+        hideFab()// mbinding.fab.hide()//Oculta el fragmentActionBottom
     }
 
     private fun setupRecyclerView() {
@@ -75,7 +78,12 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
     }
 
     // OnclickLisener
-    override fun onClick(storeEntity: StoreEntity) {
+    override fun onClick(storeId: Long) {
+         val args = Bundle()
+
+        args.putLong(getString(R.string.arg_id), storeId)
+
+        launchEditFragment(args)
 
     }
 
