@@ -122,7 +122,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
     }
 
     override fun updateStore(storeEntity: StoreEntity) {
-
+        mAdapter.updateStore(storeEntity)
     }
 }
 

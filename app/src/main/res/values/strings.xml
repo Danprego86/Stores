@@ -16,4 +16,5 @@
     <string name="edit_store_message_save_succes">Tienda agregada correctamente</string>
     <string name="store_created">Tienda ya existe</string>
     <string name="arg_id">key_id</string>
+    <string name="edit_store_message_update_succes">Tienda Actualizada</string>
 </resources>

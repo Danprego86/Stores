@@ -3,6 +3,7 @@ package com.example.stores
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
@@ -24,7 +25,7 @@ class EditStoreFragment : Fragment() {
     private lateinit var mBinding: FragmentEditStoreBinding
     private var mActivity: MainActivity? = null
     private var mIsEditMode: Boolean = false
-    private var mStoreEntity: StoreEntity?=null
+    private var mStoreEntity: StoreEntity? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -38,11 +39,15 @@ class EditStoreFragment : Fragment() {
 
         val id = arguments?.getLong(getString(R.string.arg_id), 0)
 
-        if (id != null && id != 0L){
+        if (id != null && id != 0L) {
             mIsEditMode = true
             getStore(id)
-        }else{
-            Toast.makeText(activity, id.toString(), Toast.LENGTH_SHORT).show()
+        } else {
+
+            mIsEditMode = false
+            mStoreEntity = StoreEntity(name = "", phone = "", photoUrl = "")
+
+            // Toast.makeText(activity, id.toString(), Toast.LENGTH_SHORT).show()
         }
 
         mActivity = activity as? MainActivity
@@ -61,9 +66,11 @@ class EditStoreFragment : Fragment() {
         }
     }
 
+
     private fun getStore(id: Long) {
-        val queue = LinkedBlockingQueue<StoreEntity?>() // traer un objeto de tipo SoreEntity para rellenar la vista
-        Thread{
+        val queue =
+            LinkedBlockingQueue<StoreEntity?>() // traer un objeto de tipo SoreEntity para rellenar la vista
+        Thread {
             mStoreEntity = StoreApplication.database.storeDao().getStoreById(id)
             queue.add(mStoreEntity)
         }.start()
@@ -73,18 +80,17 @@ class EditStoreFragment : Fragment() {
     }
 
     private fun setUiStore(it: StoreEntity) {
-        with(mBinding){
-            etName.setText(it.name)
-            etPhone.setText(it.phone)
-            etWebsite.setText(it.webSite)
-            etPhotoUrl.setText(it.photoUrl)
-            Glide.with(requireActivity())
-                .load(it.photoUrl)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .centerCrop()
-                .into(imgPhoto)
+        with(mBinding) {
+            etName.text = it.name.editable()
+            //etPhone.setText(it.phone)
+            etPhone.text = it.phone.editable()
+            etWebsite.text = it.webSite.editable()
+            etPhotoUrl.text = it.photoUrl.editable()
+
         }
     }
+
+    private fun String.editable(): Editable = Editable.Factory.getInstance().newEditable(this)
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_save, menu)//Se ingres un recuerso
@@ -99,40 +105,55 @@ class EditStoreFragment : Fragment() {
             }
 
             R.id.action_save -> {//Indicamos que queremos hacer cuando pinchamos en el icono de check
-                val store = StoreEntity(
-                    name = mBinding.etName.text.toString().trim(),
-                    phone = mBinding.etPhone.text.toString().trim(),
-                    webSite = mBinding.etWebsite.text.toString().trim(),
-                    photoUrl = mBinding.etPhotoUrl.text.toString().trim()
-                )
+                if (mStoreEntity != null) {
 
-                val queue = LinkedBlockingQueue<Long?>()
+                    with(mStoreEntity!!) {
+                        name = mBinding.etName.text.toString().trim()
+                        phone = mBinding.etPhone.text.toString().trim()
+                        webSite = mBinding.etWebsite.text.toString().trim()
+                        photoUrl = mBinding.etPhotoUrl.text.toString().trim()
+                    }
 
-                Thread {
-                    store.id = StoreApplication.database.storeDao()
-                        .addStore(store)// se añade eñ "store.id" para notificar los cambios de favoritos
-                    queue.add(store.id)
-                }.start()
+                    val queue = LinkedBlockingQueue<StoreEntity>()
 
-                queue.take().let {
+                    Thread {
 
-                    mActivity?.addStore(store)// indica al Main Activity la nueva tienda
-                    hideKeyboard()
-//                    Snackbar.make(mBinding.root,
-//                        getString(
-//                            R.string.edit_store_message_save_succes),
-//                            Snackbar.LENGTH_SHORT)
-//                            .show()
-                    Toast.makeText(
-                        mActivity,
-                        R.string.edit_store_message_save_succes,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    mActivity?.onBackPressedDispatcher?.onBackPressed()// Despues de guardar la tienda regresa al home
+                        if (mIsEditMode) {
+                            StoreApplication.database.storeDao().updateStore(mStoreEntity!!)
+                        } else {
+                            mStoreEntity!!.id = StoreApplication.database.storeDao()
+                                .addStore(mStoreEntity!!)// se añade eñ "store.id" para notificar los cambios de favoritos
+                        }
+                        queue.add(mStoreEntity!!)
+                    }.start()
+
+                    with(queue.take()) {
+
+                        hideKeyboard()// Ocultar teclado
+                        if (mIsEditMode) {
+                            mActivity?.updateStore(mStoreEntity!!)
+
+                            Snackbar.make(
+                                mBinding.root,
+                                R.string.edit_store_message_update_succes,
+                                Snackbar.LENGTH_SHORT
+                            )
+                                .show()
+                        } else {
+
+                            mActivity?.addStore(this)// indica al Main Activity la nueva tienda
+
+                            Toast.makeText(
+                                mActivity,
+                                R.string.edit_store_message_save_succes,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            mActivity?.onBackPressedDispatcher?.onBackPressed()// Despues de guardar la tienda regresa al home
+                        }
+                    }
                 }
                 true
             }
-
             else -> super.onOptionsItemSelected(item)
         }
     }
