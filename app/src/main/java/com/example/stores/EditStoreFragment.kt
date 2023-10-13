@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.stores.databinding.FragmentEditStoreBinding
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputLayout
 import java.util.concurrent.LinkedBlockingQueue
 
 class EditStoreFragment : Fragment() {
@@ -57,13 +58,30 @@ class EditStoreFragment : Fragment() {
 
         setHasOptionsMenu(true)//Tener acceso al menu
 
+        setupTexfiles()
+    }
+
+    private fun setupTexfiles() {
+
+        // mBinding.etPhotoUrl.addTextChangedListener {loadImagen(it.toString().trim())} En este punto unimos los addtextChangeLisener con el de la linea de abajo
+
+        mBinding.etName.addTextChangedListener { validateFiles(mBinding.tilName) } // Lo que pongamos en este espacio se ejecutara despues de que el texto haya sido cambiado
+        mBinding.etPhone.addTextChangedListener { validateFiles(mBinding.tilPhone) } // Lo que pongamos en este espacio se ejecutara despues de que el texto haya sido cambiado
         mBinding.etPhotoUrl.addTextChangedListener {
-            Glide.with(this)
-                .load(mBinding.etPhotoUrl.text.toString())
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .centerCrop()
-                .into(mBinding.imgPhoto)
-        }
+            validateFiles(mBinding.tilPhotoUrl)
+            loadImagen(it.toString().trim())
+        } // Lo que pongamos en este espacio se ejecutara despues de que el texto haya sido cambiado
+
+    }
+
+    private fun loadImagen(url: String) {
+
+        Glide.with(this)
+            //.load(mBinding.etPhotoUrl.text.toString())
+            .load(url)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .centerCrop()
+            .into(mBinding.imgPhoto)
     }
 
 
@@ -105,7 +123,12 @@ class EditStoreFragment : Fragment() {
             }
 
             R.id.action_save -> {//Indicamos que queremos hacer cuando pinchamos en el icono de check
-                if (mStoreEntity != null) {
+                if (mStoreEntity != null && validateFiles(
+                        mBinding.tilPhotoUrl,
+                        mBinding.tilPhone,
+                        mBinding.tilName
+                    )
+                ) {
 
                     with(mStoreEntity!!) {
                         name = mBinding.etName.text.toString().trim()
@@ -154,9 +177,54 @@ class EditStoreFragment : Fragment() {
                 }
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+    private fun validateFiles(vararg texFiles: TextInputLayout): Boolean {// validacion de campos con recursividad
+        var isvalid = true
+
+        for (texFile in texFiles) {
+            if (texFile.editText?.text.toString().trim().isEmpty()) {
+                texFile.error = getString(R.string.helper_required)
+                isvalid = false
+            } else {
+                texFile.error = null
+            }
+        }
+
+        if (!isvalid) {
+            Snackbar.make(
+                mBinding.root,
+                R.string.edit_store_message_valid,
+                Snackbar.LENGTH_SHORT
+            ).show()
+        }
+
+        return isvalid
+    }
+
+    /* private fun validateFiles(): Boolean {// validacion de los campos ya que hasta el momento los guarda en blanco
+         var isValid = true
+
+         if (mBinding.etPhotoUrl.text.toString().trim().isEmpty()) {
+             mBinding.tilPhotoUrl.error = getString(R.string.helper_required)
+             mBinding.etPhotoUrl.requestFocus() // RequestFocus() indica donde hace falta el campo por llenar
+             isValid = false
+         }
+         if (mBinding.etPhone.text.toString().trim().isEmpty()) {
+             mBinding.tilPhone.error = getString(R.string.helper_required)
+             mBinding.etPhone.requestFocus()
+             isValid = false
+         }
+         if (mBinding.etName.text.toString().trim().isEmpty()) {
+             mBinding.tilName.error = getString(R.string.helper_required)
+             mBinding.etName.requestFocus()
+             isValid = false
+         }
+         return isValid
+     }*/
 
     override fun onDestroyView() {//Metodo para ocultar teclado cuando retrocedemos con la flecha
         hideKeyboard()
