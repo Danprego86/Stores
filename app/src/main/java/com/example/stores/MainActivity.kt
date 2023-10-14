@@ -5,6 +5,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract.CommonDataKinds.Website
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -117,7 +118,8 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
                     //1 -> Toast.makeText(this, "Llamar...", Toast.LENGTH_SHORT).show()
                     1 -> dial(storeEntity.phone)
 
-                    2 -> Toast.makeText(this, "Sitio web...", Toast.LENGTH_SHORT).show()
+                    //2 -> Toast.makeText(this, "Sitio web...", Toast.LENGTH_SHORT).show()
+                    2 -> toGoWebSite(storeEntity.webSite)
                 }
             }).show()
     }
@@ -143,14 +145,44 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
             .show()
     }
 
+
     private fun dial(phone: String) {
 
         val callIntent = Intent().apply {
 
             action = Intent.ACTION_DIAL// accion a realizar con el numero de telefono
-            data = Uri.parse("tel:+57$phone")//pasamos el numero guardado en la tienda para llamar con el indicativo
+            data =
+                Uri.parse("tel:$phone")//pasamos el numero guardado en la tienda para llamar con el indicativo
         }
-        startActivity(callIntent)//Inicia el intent
+        starIntent(callIntent)
+    }
+
+
+    private fun toGoWebSite(website: String) {
+
+        if (website.isEmpty()) {// validacion de sitio web
+
+            Toast.makeText(this, R.string.main_error_no_website, Toast.LENGTH_SHORT).show()
+
+        } else {
+
+            val webSiteIntent = Intent().apply {
+
+                action = Intent.ACTION_VIEW
+                data = Uri.parse(website)
+            }
+            starIntent(webSiteIntent)
+        }
+    }
+
+    private fun starIntent(intent: Intent) {
+
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)//Inicia el intent
+        } else {
+            Toast.makeText(this, R.string.main_error_no_resolve, Toast.LENGTH_SHORT).show()
+        }
+
     }
 
 

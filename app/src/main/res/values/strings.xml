@@ -23,4 +23,6 @@
     <string name="dialog_delete_confirm">Eliminar</string>
     <string name="dialog_delete_cancel">Cancelar</string>
     <string name="dialog_options_title">¿Que deseas hacer?</string>
+    <string name="main_error_no_website">La tienda no cuenta con sitio web</string>
+    <string name="main_error_no_resolve">No se encontro ninguna app asociada</string>
 </resources>

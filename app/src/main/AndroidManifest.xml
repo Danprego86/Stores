@@ -7,7 +7,9 @@
         android:required="false" />
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:maxSdkVersion="19" android:name="android.permission.CALL_PHONE"/>
+    <uses-permission
+        android:name="android.permission.CALL_PHONE"
+        android:maxSdkVersion="19" />
 
     <application
         android:name=".StoreApplication"
@@ -23,13 +25,11 @@
 
         <activity
             android:name=".EditStoreFragment"
-            android:exported="false"/>
+            android:exported="false" />
 
         <activity
             android:name=".MainActivity"
             android:exported="true">
-
-
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,5 +37,18 @@
             </intent-filter>
         </activity>
     </application>
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.DIAL"/>
+        </intent>
+
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
+            <category android:name="android.intent.category.BROWSABLE"/>
+
+        </intent>
+    </queries>
 
 </manifest>
