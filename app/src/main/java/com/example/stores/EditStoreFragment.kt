@@ -51,27 +51,35 @@ class EditStoreFragment : Fragment() {
             // Toast.makeText(activity, id.toString(), Toast.LENGTH_SHORT).show()
         }
 
+        setupActionBar()
+        setupTexfiles()
+    }
+
+    private fun setupActionBar() {
         mActivity = activity as? MainActivity
         mActivity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)// Se habilita flecha de retroceso
         mActivity?.supportActionBar?.title =
-            getString(R.string.edit_store_title_add)// Se cambia el titulo de la tienda en el segundo fragment
+            if (mIsEditMode) {
+                getString(R.string.edit_store_title_edit)// Se edita el titulo de la tienda en el segundo fragment
+            } else {
+                getString(R.string.edit_store_title_add)// Se añade nueva tienda en el segundo fragment
+            }
 
         setHasOptionsMenu(true)//Tener acceso al menu
-
-        setupTexfiles()
     }
 
     private fun setupTexfiles() {
 
-        // mBinding.etPhotoUrl.addTextChangedListener {loadImagen(it.toString().trim())} En este punto unimos los addtextChangeLisener con el de la linea de abajo
+        with(mBinding) {
 
-        mBinding.etName.addTextChangedListener { validateFiles(mBinding.tilName) } // Lo que pongamos en este espacio se ejecutara despues de que el texto haya sido cambiado
-        mBinding.etPhone.addTextChangedListener { validateFiles(mBinding.tilPhone) } // Lo que pongamos en este espacio se ejecutara despues de que el texto haya sido cambiado
-        mBinding.etPhotoUrl.addTextChangedListener {
-            validateFiles(mBinding.tilPhotoUrl)
-            loadImagen(it.toString().trim())
-        } // Lo que pongamos en este espacio se ejecutara despues de que el texto haya sido cambiado
-
+            // mBinding.etPhotoUrl.addTextChangedListener {loadImagen(it.toString().trim())} En este punto unimos los addtextChangeLisener con el de la linea de abajo
+            etName.addTextChangedListener { validateFiles(tilName) } // Lo que pongamos en este espacio se ejecutara despues de que el texto haya sido cambiado
+            etPhone.addTextChangedListener { validateFiles(tilPhone) } // Lo que pongamos en este espacio se ejecutara despues de que el texto haya sido cambiado
+            etPhotoUrl.addTextChangedListener {
+                validateFiles(tilPhotoUrl)
+                loadImagen(it.toString().trim())
+            } // Lo que pongamos en este espacio se ejecutara despues de que el texto haya sido cambiado
+        }
     }
 
     private fun loadImagen(url: String) {

@@ -1,11 +1,15 @@
 package com.example.stores
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.stores.databinding.ActivityMainBinding
-import com.google.android.material.internal.ContextUtils.getActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.concurrent.LinkedBlockingQueue
 import kotlin.concurrent.thread
 
@@ -38,10 +42,12 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
 
 
     @SuppressLint("CommitTransaction")
-    private fun launchEditFragment(args : Bundle? = null) {
+    private fun launchEditFragment(args: Bundle? = null) {
         val fragment = EditStoreFragment()// Se instancia la clase EditStoreFragment
 
-        if (args != null){ fragment.arguments = args }
+        if (args != null) {
+            fragment.arguments = args
+        }
 
         val fragmentManager = supportFragmentManager // Es el que controla los fragmentos
         val fragmentTransaction = fragmentManager.beginTransaction() //Indica como se va a realizar
@@ -79,7 +85,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
 
     // OnclickLisener
     override fun onClick(storeId: Long) {
-         val args = Bundle()
+        val args = Bundle()
 
         args.putLong(getString(R.string.arg_id), storeId)
 
@@ -94,19 +100,59 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
             StoreApplication.database.storeDao().updateStore(storeEntity)
             queue.add(storeEntity)
         }
-        mAdapter.updateStore(queue.take())
+        //mAdapter.updateStore(queue.take())
+        updateStore(queue.take())
     }
 
 
     override fun onDeleteStore(storeEntity: StoreEntity) {
-        val queue = LinkedBlockingQueue<StoreEntity>()// Se crea un cola
+        val items = arrayOf("Eliminar", "Llamar", "Ir al sitio web")
 
-        Thread {
-            StoreApplication.database.storeDao().deleteStore(storeEntity)
-            queue.add(storeEntity)
-        }.start()
-        mAdapter.delete(queue.take())// Se pasa al adaptador la tienda a eliminar
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.dialog_options_title)
+            .setItems(items, DialogInterface.OnClickListener { dialog, i ->
+                when (i) {
+                    0 -> confirmDelete(storeEntity)
+
+                    //1 -> Toast.makeText(this, "Llamar...", Toast.LENGTH_SHORT).show()
+                    1 -> dial(storeEntity.phone)
+
+                    2 -> Toast.makeText(this, "Sitio web...", Toast.LENGTH_SHORT).show()
+                }
+            }).show()
     }
+
+    private fun confirmDelete(storeEntity: StoreEntity) {
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.dialog_delete_title)
+            .setPositiveButton(
+                R.string.dialog_delete_confirm,
+                DialogInterface.OnClickListener { dialog, which ->
+
+                    val queue = LinkedBlockingQueue<StoreEntity>()// Se crea un cola
+
+                    Thread {
+                        StoreApplication.database.storeDao().deleteStore(storeEntity)
+                        queue.add(storeEntity)
+                    }.start()
+                    mAdapter.delete(queue.take())// Se pasa al adaptador la tienda a eliminar
+
+                })
+            .setNegativeButton(R.string.dialog_delete_cancel, null)
+            .show()
+    }
+
+    private fun dial(phone: String) {
+
+        val callIntent = Intent().apply {
+
+            action = Intent.ACTION_DIAL// accion a realizar con el numero de telefono
+            data = Uri.parse("tel:+57$phone")//pasamos el numero guardado en la tienda para llamar con el indicativo
+        }
+        startActivity(callIntent)//Inicia el intent
+    }
+
 
     override fun hideFab(isVisible: Boolean) {
         if (isVisible)
