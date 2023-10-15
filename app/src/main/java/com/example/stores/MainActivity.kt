@@ -5,7 +5,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.ContactsContract.CommonDataKinds.Website
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -61,7 +60,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
 
     private fun setupRecyclerView() {
         mAdapter = StoreAdapter(mutableListOf(), this)
-        mGridLayout = GridLayoutManager(this, 2)
+        mGridLayout = GridLayoutManager(this, resources.getInteger(R.integer.main_columns))
         getStore()
         mbinding.recyclerView.apply {
 
@@ -107,11 +106,12 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
 
 
     override fun onDeleteStore(storeEntity: StoreEntity) {
-        val items = arrayOf("Eliminar", "Llamar", "Ir al sitio web")
+        //val items = arrayOf("Eliminar", "Llamar", "Ir al sitio web")
+        val items = resources.getStringArray(R.array.array_options_items)// Mejores formas de implememtacion de array de string
 
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.dialog_options_title)
-            .setItems(items, DialogInterface.OnClickListener { dialog, i ->
+            .setItems(items) { dialog, i ->
                 when (i) {
                     0 -> confirmDelete(storeEntity)
 
@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
                     //2 -> Toast.makeText(this, "Sitio web...", Toast.LENGTH_SHORT).show()
                     2 -> toGoWebSite(storeEntity.webSite)
                 }
-            }).show()
+            }.show()
     }
 
     private fun confirmDelete(storeEntity: StoreEntity) {

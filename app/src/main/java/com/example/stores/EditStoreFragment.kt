@@ -1,6 +1,5 @@
 package com.example.stores
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
@@ -13,10 +12,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.addTextChangedListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.stores.databinding.FragmentEditStoreBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import java.util.concurrent.LinkedBlockingQueue
@@ -118,6 +119,26 @@ class EditStoreFragment : Fragment() {
 
     private fun String.editable(): Editable = Editable.Factory.getInstance().newEditable(this)
 
+    override fun onAttach(context: Context) {// Este se ejecuta cuando el fragmento se enlaza con la actividad
+        super.onAttach(context)
+        requireActivity().onBackPressedDispatcher.addCallback(this,object : OnBackPressedCallback(true){
+
+            override fun handleOnBackPressed() {
+                MaterialAlertDialogBuilder(requireContext())//indica si el cliente quiere regresar o seguir en la misma pantalla
+                    .setTitle(R.string.dialog_exit_title)
+                    .setMessage(R.string.dialog_exit_message)
+                    .setPositiveButton(R.string.dialog_exit_ok){_,_->
+                        if (isEnabled){
+                            isEnabled= false
+                            requireActivity().onBackPressedDispatcher.onBackPressed()
+                        }
+                    }
+                    .setNegativeButton(R.string.dialog_delete_cancel,null)
+                    .show()
+            }
+        })
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_save, menu)//Se ingres un recuerso
         super.onCreateOptionsMenu(menu, inflater)
@@ -126,7 +147,7 @@ class EditStoreFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {//Opcion para retroceder y guardar
         return when (item.itemId) {
             android.R.id.home -> {
-                mActivity?.onBackPressedDispatcher?.onBackPressed()
+                requireActivity().onBackPressedDispatcher.onBackPressed()
                 true
             }
 
@@ -179,7 +200,7 @@ class EditStoreFragment : Fragment() {
                                 R.string.edit_store_message_save_succes,
                                 Toast.LENGTH_SHORT
                             ).show()
-                            mActivity?.onBackPressedDispatcher?.onBackPressed()// Despues de guardar la tienda regresa al home
+                            requireActivity().onBackPressedDispatcher.onBackPressed()// Despues de guardar la tienda regresa al home
                         }
                     }
                 }
