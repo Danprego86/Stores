@@ -16,6 +16,7 @@ import com.example.stores.StoreApplication
 import com.example.stores.common.entities.StoreEntity
 import com.example.stores.databinding.ActivityMainBinding
 import com.example.stores.common.utils.mainAux
+import com.example.stores.editModule.viewModel.editStoreViewModel
 import com.example.stores.mainModule.adapter.OnClickListener
 import com.example.stores.mainModule.adapter.StoreAdapter
 import com.example.stores.mainModule.viewModel.MainViewModel
@@ -23,7 +24,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.concurrent.LinkedBlockingQueue
 import kotlin.concurrent.thread
 
-class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
+class MainActivity : AppCompatActivity(), OnClickListener {
 
     private lateinit var mbinding: ActivityMainBinding
     private lateinit var mAdapter: StoreAdapter
@@ -31,6 +32,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
 
     //MVVM
     private lateinit var mMainViewModel: MainViewModel
+    private lateinit var mEditStoreViewModel: editStoreViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,17 +59,32 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
     }
 
     private fun setupViewModel() {//Inicializar el mMianViewModel para ver las propiedades del MianViewmodel dentro de nuestra vista
-        mMainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        mMainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
         mMainViewModel.getStores().observe(this) { stores ->
 
-            mAdapter.setStores(stores)
+            mAdapter.setStores(stores as MutableList<StoreEntity>)
         }
+
+        mEditStoreViewModel = ViewModelProvider(this).get(editStoreViewModel::class.java)
+
+        mEditStoreViewModel.getShowFab().observe(this) { isVisible ->
+
+            if (isVisible)
+                mbinding.fab.show()
+            else {
+                mbinding.fab.hide()
+            }
+        }
+
+
     }
 
 
     @SuppressLint("CommitTransaction")
     private fun launchEditFragment(args: Bundle? = null) {
+
+        mEditStoreViewModel.setShowFab(false)
         val fragment = EditStoreFragment()// Se instancia la clase EditStoreFragment
 
         if (args != null) {
@@ -80,7 +97,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
         fragmentTransaction.addToBackStack(null)// se indica que devuelve a la pantalla anterior de la app
         fragmentTransaction.commit()// Para que se apliquen los cambios.
 
-        hideFab()// mbinding.fab.hide()//Oculta el fragmentActionBottom
+        //hideFab()// mbinding.fab.hide()//Oculta el fragmentActionBottom
     }
 
     private fun setupRecyclerView() {
@@ -119,20 +136,15 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
     }
 
     override fun onFavoriteStore(storeEntity: StoreEntity) {
-        storeEntity.isFavorite = !storeEntity.isFavorite
-        val queue = LinkedBlockingQueue<StoreEntity>()
-        thread {
-            StoreApplication.database.storeDao().updateStore(storeEntity)
-            queue.add(storeEntity)
-        }
-        //mAdapter.updateStore(queue.take())
-        updateStore(queue.take())
+
+        mMainViewModel.updateStore(storeEntity)
     }
 
 
     override fun onDeleteStore(storeEntity: StoreEntity) {
         //val items = arrayOf("Eliminar", "Llamar", "Ir al sitio web")
-        val items = resources.getStringArray(R.array.array_options_items)// Mejores formas de implememtacion de array de string
+        val items =
+            resources.getStringArray(R.array.array_options_items)// Mejores formas de implememtacion de array de string
 
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.dialog_options_title)
@@ -156,15 +168,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
             .setPositiveButton(
                 R.string.dialog_delete_confirm,
                 DialogInterface.OnClickListener { dialog, which ->
-
-                    val queue = LinkedBlockingQueue<StoreEntity>()// Se crea un cola
-
-                    Thread {
-                        StoreApplication.database.storeDao().deleteStore(storeEntity)
-                        queue.add(storeEntity)
-                    }.start()
-                    mAdapter.delete(queue.take())// Se pasa al adaptador la tienda a eliminar
-
+                    mMainViewModel.deleteStore(storeEntity)
                 })
             .setNegativeButton(R.string.dialog_delete_cancel, null)
             .show()
@@ -211,21 +215,21 @@ class MainActivity : AppCompatActivity(), OnClickListener, mainAux {
     }
 
 
-    override fun hideFab(isVisible: Boolean) {
-        if (isVisible)
-            mbinding.fab.show()
-        else {
-            mbinding.fab.hide()
-        }
-    }
-
-    override fun addStore(storeEntity: StoreEntity) {// indica al adaptador la nueva tienda añadida
-        mAdapter.add(storeEntity)
-
-    }
-
-    override fun updateStore(storeEntity: StoreEntity) {
-        mAdapter.updateStore(storeEntity)
-    }
+//    override fun hideFab(isVisible: Boolean) {
+//        if (isVisible)
+//            mbinding.fab.show()
+//        else {
+//            mbinding.fab.hide()
+//        }
+//    }
+//
+//    override fun addStore(storeEntity: StoreEntity) {// indica al adaptador la nueva tienda añadida
+//        mAdapter.add(storeEntity)
+//
+//    }
+//
+//    override fun updateStore(storeEntity: StoreEntity) {
+//        mAdapter.updateStore(storeEntity)
+//    }
 }
 

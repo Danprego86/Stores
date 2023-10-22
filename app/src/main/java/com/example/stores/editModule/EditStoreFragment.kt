@@ -14,12 +14,14 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.stores.R
 import com.example.stores.StoreApplication
 import com.example.stores.common.entities.StoreEntity
 import com.example.stores.databinding.FragmentEditStoreBinding
+import com.example.stores.editModule.viewModel.editStoreViewModel
 import com.example.stores.mainModule.MainActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -29,9 +31,20 @@ import java.util.concurrent.LinkedBlockingQueue
 class EditStoreFragment : Fragment() {
 
     private lateinit var mBinding: FragmentEditStoreBinding
+
+
+    //MVVM
+    private lateinit var mEditStoreViewModel :editStoreViewModel
+
     private var mActivity: MainActivity? = null
     private var mIsEditMode: Boolean = false
     private var mStoreEntity: StoreEntity? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        mEditStoreViewModel = ViewModelProvider(requireActivity()).get(editStoreViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -56,8 +69,15 @@ class EditStoreFragment : Fragment() {
             // Toast.makeText(activity, id.toString(), Toast.LENGTH_SHORT).show()
         }
 
+        //MVVM
+        setupViewModel()
+
         setupActionBar()
         setupTexfiles()
+    }
+
+    private fun setupViewModel() {
+
     }
 
     private fun setupActionBar() {
@@ -187,7 +207,7 @@ class EditStoreFragment : Fragment() {
 
                         hideKeyboard()// Ocultar teclado
                         if (mIsEditMode) {
-                            mActivity?.updateStore(mStoreEntity!!)
+                            //mActivity?.updateStore(mStoreEntity!!)
 
                             Snackbar.make(
                                 mBinding.root,
@@ -197,7 +217,7 @@ class EditStoreFragment : Fragment() {
                                 .show()
                         } else {
 
-                            mActivity?.addStore(this)// indica al Main Activity la nueva tienda
+                           // mActivity?.addStore(this)// indica al Main Activity la nueva tienda
 
                             Toast.makeText(
                                 mActivity,
@@ -210,7 +230,6 @@ class EditStoreFragment : Fragment() {
                 }
                 true
             }
-
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -274,7 +293,8 @@ class EditStoreFragment : Fragment() {
         mActivity?.supportActionBar?.setDisplayHomeAsUpEnabled(false)
         mActivity?.supportActionBar?.title =
             getString(R.string.app_name)//Indicamos volver a mostrar el nombre de la app
-        mActivity?.hideFab(true)
+       // mActivity?.hideFab(true)
+        mEditStoreViewModel.setShowFab(true)
         setHasOptionsMenu(false)
         super.onDestroy()
     }

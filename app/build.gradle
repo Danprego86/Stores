@@ -37,6 +37,7 @@ android {
     }
 }
 def room_version = "2.5.0"
+def anko_version="0.10.8"
 
 
         dependencies {
@@ -48,11 +49,6 @@ def room_version = "2.5.0"
             implementation 'androidx.appcompat:appcompat:1.6.1'
             implementation 'com.google.android.material:material:1.6.0-alpha01'
             implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-
-            //viewmodel
-            //implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
-            //implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
-
 
             implementation 'com.github.bumptech.glide:glide:4.11.0'
             kapt 'com.github.bumptech.glide:compiler:4.11.0'
