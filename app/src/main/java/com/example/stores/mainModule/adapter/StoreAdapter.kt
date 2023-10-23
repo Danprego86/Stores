@@ -48,10 +48,14 @@ class StoreAdapter(
     @SuppressLint("NotifyDataSetChanged")
     fun add(storeEntity: StoreEntity) {
 
-        if (!stores.contains(storeEntity)){ // validacion de si una tienda ya existe
+        if (storeEntity.id!=0L) {
+            if (!stores.contains(storeEntity)){ // validacion de si una tienda ya existe
 
-            stores.add(storeEntity)
-            notifyItemInserted(stores.size-1)//Valida el elemento ingresado con el de la ultima posicion
+                stores.add(storeEntity)
+                notifyItemInserted(stores.size-1)//Valida el elemento ingresado con el de la ultima posicion
+            }else{
+                updateStore(storeEntity)
+            }
         }
     }
 
@@ -62,7 +66,7 @@ class StoreAdapter(
         notifyDataSetChanged()
     }
 
-    fun updateStore(storeEntity: StoreEntity?) {
+     private fun updateStore(storeEntity: StoreEntity?) {
         val index = stores.indexOf(storeEntity)
 
         if (index != -1) {
@@ -71,11 +75,6 @@ class StoreAdapter(
                 notifyItemChanged(index)
             }
         }
-    }
-
-    fun delete(storeEntity: StoreEntity) {
-
-
     }
 
     //Class Inner
@@ -88,7 +87,7 @@ class StoreAdapter(
             with(binding.root) {
 
                 setOnClickListener {
-                    listener.onClick(storeEntity.id)
+                    listener.onClick(storeEntity)
                 }
 
                 setOnLongClickListener {

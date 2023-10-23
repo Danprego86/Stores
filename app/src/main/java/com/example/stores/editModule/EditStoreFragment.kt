@@ -18,7 +18,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.stores.R
-import com.example.stores.StoreApplication
 import com.example.stores.common.entities.StoreEntity
 import com.example.stores.databinding.FragmentEditStoreBinding
 import com.example.stores.editModule.viewModel.editStoreViewModel
@@ -26,24 +25,23 @@ import com.example.stores.mainModule.MainActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
-import java.util.concurrent.LinkedBlockingQueue
+
 
 class EditStoreFragment : Fragment() {
 
     private lateinit var mBinding: FragmentEditStoreBinding
-
-
     //MVVM
-    private lateinit var mEditStoreViewModel :editStoreViewModel
+    private lateinit var mEditStoreViewModel: editStoreViewModel
 
     private var mActivity: MainActivity? = null
     private var mIsEditMode: Boolean = false
-    private var mStoreEntity: StoreEntity? = null
+    private lateinit var mStoreEntity: StoreEntity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mEditStoreViewModel = ViewModelProvider(requireActivity()).get(editStoreViewModel::class.java)
+        mEditStoreViewModel =
+            ViewModelProvider(requireActivity()).get(editStoreViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -55,29 +53,54 @@ class EditStoreFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val id = arguments?.getLong(getString(R.string.arg_id), 0)
-
-        if (id != null && id != 0L) {
-            mIsEditMode = true
-            getStore(id)
-        } else {
-
-            mIsEditMode = false
-            mStoreEntity = StoreEntity(name = "", phone = "", photoUrl = "")
-
-            // Toast.makeText(activity, id.toString(), Toast.LENGTH_SHORT).show()
-        }
-
         //MVVM
         setupViewModel()
-
-        setupActionBar()
         setupTexfiles()
     }
 
     private fun setupViewModel() {
+        mEditStoreViewModel.getStoreSelected().observe(viewLifecycleOwner) {
 
+            mStoreEntity = it
+            if (it.id != 0L) {
+                mIsEditMode = true
+                //getStore(it.id)
+                setUiStore(it)
+            } else {
+                mIsEditMode = false
+            }
+            setupActionBar()
+        }
+
+        mEditStoreViewModel.getResult().observe(viewLifecycleOwner) { result ->
+
+            hideKeyboard()
+
+            when (result) {
+
+                is Long -> {
+                    // mActivity?.addStore(this)// indica al Main Activity la nueva tienda
+                    mStoreEntity.id = result
+                    mEditStoreViewModel.setStoreSelected(mStoreEntity)
+                    Toast.makeText(
+                        mActivity,
+                        R.string.edit_store_message_save_succes,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    requireActivity().onBackPressedDispatcher.onBackPressed()// Despues de guardar la tienda regresa al home
+                }
+
+                is StoreEntity -> {
+                    //mActivity?.updateStore(mStoreEntity!!)
+                    mEditStoreViewModel.setStoreSelected(mStoreEntity)
+                    Snackbar.make(
+                        mBinding.root,
+                        R.string.edit_store_message_update_succes,
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
     }
 
     private fun setupActionBar() {
@@ -118,17 +141,17 @@ class EditStoreFragment : Fragment() {
     }
 
 
-    private fun getStore(id: Long) {
-        val queue =
-            LinkedBlockingQueue<StoreEntity?>() // traer un objeto de tipo SoreEntity para rellenar la vista
-        Thread {
-            mStoreEntity = StoreApplication.database.storeDao().getStoreById(id)
-            queue.add(mStoreEntity)
-        }.start()
-        queue.take()?.let {// si el resultado no es null realice lo de adentro de let
-            setUiStore(it)
-        }
-    }
+//    private fun getStore(id: Long) {
+//        val queue =
+//            LinkedBlockingQueue<StoreEntity?>() // traer un objeto de tipo SoreEntity para rellenar la vista
+//        Thread {
+//            mStoreEntity = StoreApplication.database.storeDao().getStoreById(id)
+//            queue.add(mStoreEntity)
+//        }.start()
+//        queue.take()?.let {// si el resultado no es null realice lo de adentro de let
+//            setUiStore(it)
+//        }
+//    }
 
     private fun setUiStore(it: StoreEntity) {
         with(mBinding) {
@@ -145,22 +168,22 @@ class EditStoreFragment : Fragment() {
 
     override fun onAttach(context: Context) {// Este se ejecuta cuando el fragmento se enlaza con la actividad
         super.onAttach(context)
-        requireActivity().onBackPressedDispatcher.addCallback(this,object : OnBackPressedCallback(true){
-
-            override fun handleOnBackPressed() {
-                MaterialAlertDialogBuilder(requireContext())//indica si el cliente quiere regresar o seguir en la misma pantalla
-                    .setTitle(R.string.dialog_exit_title)
-                    .setMessage(R.string.dialog_exit_message)
-                    .setPositiveButton(R.string.dialog_exit_ok){ _, _->
-                        if (isEnabled){
-                            isEnabled= false
-                            requireActivity().onBackPressedDispatcher.onBackPressed()
+        requireActivity().onBackPressedDispatcher.addCallback(this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    MaterialAlertDialogBuilder(requireContext())//indica si el cliente quiere regresar o seguir en la misma pantalla
+                        .setTitle(R.string.dialog_exit_title)
+                        .setMessage(R.string.dialog_exit_message)
+                        .setPositiveButton(R.string.dialog_exit_ok) { _, _ ->
+                            if (isEnabled) {
+                                isEnabled = false
+                                requireActivity().onBackPressedDispatcher.onBackPressed()
+                            }
                         }
-                    }
-                    .setNegativeButton(R.string.dialog_delete_cancel,null)
-                    .show()
-            }
-        })
+                        .setNegativeButton(R.string.dialog_delete_cancel, null)
+                        .show()
+                }
+            })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -176,60 +199,30 @@ class EditStoreFragment : Fragment() {
             }
 
             R.id.action_save -> {//Indicamos que queremos hacer cuando pinchamos en el icono de check
-                if (mStoreEntity != null && validateFiles(
+                if (validateFiles(
                         mBinding.tilPhotoUrl,
                         mBinding.tilPhone,
                         mBinding.tilName
                     )
                 ) {
-
-                    with(mStoreEntity!!) {
+                    with(mStoreEntity) {
                         name = mBinding.etName.text.toString().trim()
                         phone = mBinding.etPhone.text.toString().trim()
                         webSite = mBinding.etWebsite.text.toString().trim()
                         photoUrl = mBinding.etPhotoUrl.text.toString().trim()
                     }
 
-                    val queue = LinkedBlockingQueue<StoreEntity>()
-
-                    Thread {
-
-                        if (mIsEditMode) {
-                            StoreApplication.database.storeDao().updateStore(mStoreEntity!!)
-                        } else {
-                            mStoreEntity!!.id = StoreApplication.database.storeDao()
-                                .addStore(mStoreEntity!!)// se añade eñ "store.id" para notificar los cambios de favoritos
-                        }
-                        queue.add(mStoreEntity!!)
-                    }.start()
-
-                    with(queue.take()) {
-
-                        hideKeyboard()// Ocultar teclado
-                        if (mIsEditMode) {
-                            //mActivity?.updateStore(mStoreEntity!!)
-
-                            Snackbar.make(
-                                mBinding.root,
-                                R.string.edit_store_message_update_succes,
-                                Snackbar.LENGTH_SHORT
-                            )
-                                .show()
-                        } else {
-
-                           // mActivity?.addStore(this)// indica al Main Activity la nueva tienda
-
-                            Toast.makeText(
-                                mActivity,
-                                R.string.edit_store_message_save_succes,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            requireActivity().onBackPressedDispatcher.onBackPressed()// Despues de guardar la tienda regresa al home
-                        }
+                    if (mIsEditMode) {
+                        //StoreApplication.database.storeDao().updateStore(mStoreEntity!!)
+                        mEditStoreViewModel.updateStores(mStoreEntity)
+                    } else {
+                        //mStoreEntity!!.id = StoreApplication.database.storeDao().addStore(mStoreEntity!!)// se añade eñ "store.id" para notificar los cambios de favoritos
+                        mEditStoreViewModel.saveStore(mStoreEntity)
                     }
                 }
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -293,8 +286,9 @@ class EditStoreFragment : Fragment() {
         mActivity?.supportActionBar?.setDisplayHomeAsUpEnabled(false)
         mActivity?.supportActionBar?.title =
             getString(R.string.app_name)//Indicamos volver a mostrar el nombre de la app
-       // mActivity?.hideFab(true)
+        // mActivity?.hideFab(true)
         mEditStoreViewModel.setShowFab(true)
+        mEditStoreViewModel.setResult(Any())// Se limpiara lo que esta en vewModel
         setHasOptionsMenu(false)
         super.onDestroy()
     }

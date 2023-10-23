@@ -59,14 +59,14 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     }
 
     private fun setupViewModel() {//Inicializar el mMianViewModel para ver las propiedades del MianViewmodel dentro de nuestra vista
+
         mMainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        mEditStoreViewModel = ViewModelProvider(this)[editStoreViewModel::class.java]
 
         mMainViewModel.getStores().observe(this) { stores ->
 
             mAdapter.setStores(stores as MutableList<StoreEntity>)
         }
-
-        mEditStoreViewModel = ViewModelProvider(this).get(editStoreViewModel::class.java)
 
         mEditStoreViewModel.getShowFab().observe(this) { isVisible ->
 
@@ -76,21 +76,20 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                 mbinding.fab.hide()
             }
         }
+        mEditStoreViewModel.getStoreSelected().observe(this) {
+
+            mAdapter.add(it)
+        }
 
 
     }
 
-
     @SuppressLint("CommitTransaction")
-    private fun launchEditFragment(args: Bundle? = null) {
+    private fun launchEditFragment(storeEntity: StoreEntity= StoreEntity()) {
 
         mEditStoreViewModel.setShowFab(false)
+        mEditStoreViewModel.setStoreSelected(storeEntity)
         val fragment = EditStoreFragment()// Se instancia la clase EditStoreFragment
-
-        if (args != null) {
-            fragment.arguments = args
-        }
-
         val fragmentManager = supportFragmentManager // Es el que controla los fragmentos
         val fragmentTransaction = fragmentManager.beginTransaction() //Indica como se va a realizar
         fragmentTransaction.add(R.id.containerMain, fragment)
@@ -126,13 +125,8 @@ class MainActivity : AppCompatActivity(), OnClickListener {
 //    }
 
     // OnclickLisener
-    override fun onClick(storeId: Long) {
-        val args = Bundle()
-
-        args.putLong(getString(R.string.arg_id), storeId)
-
-        launchEditFragment(args)
-
+    override fun onClick(storeEntity: StoreEntity) {
+        launchEditFragment(storeEntity)
     }
 
     override fun onFavoriteStore(storeEntity: StoreEntity) {
