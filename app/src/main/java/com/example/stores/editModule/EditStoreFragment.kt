@@ -40,8 +40,7 @@ class EditStoreFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mEditStoreViewModel =
-            ViewModelProvider(requireActivity()).get(editStoreViewModel::class.java)
+        mEditStoreViewModel = ViewModelProvider(requireActivity()).get(editStoreViewModel::class.java)
     }
 
     override fun onCreateView(

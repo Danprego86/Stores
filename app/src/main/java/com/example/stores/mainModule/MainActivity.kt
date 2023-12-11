@@ -5,24 +5,24 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.get
+
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.stores.editModule.EditStoreFragment
 import com.example.stores.R
-import com.example.stores.StoreApplication
+
 import com.example.stores.common.entities.StoreEntity
 import com.example.stores.databinding.ActivityMainBinding
-import com.example.stores.common.utils.mainAux
+
 import com.example.stores.editModule.viewModel.editStoreViewModel
 import com.example.stores.mainModule.adapter.OnClickListener
 import com.example.stores.mainModule.adapter.StoreAdapter
 import com.example.stores.mainModule.viewModel.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.util.concurrent.LinkedBlockingQueue
-import kotlin.concurrent.thread
+
 
 class MainActivity : AppCompatActivity(), OnClickListener {
 
@@ -64,8 +64,11 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         mEditStoreViewModel = ViewModelProvider(this)[editStoreViewModel::class.java]
 
         mMainViewModel.getStores().observe(this) { stores ->
-
             mAdapter.setStores(stores as MutableList<StoreEntity>)
+        }
+
+        mMainViewModel.isShowProgress().observe(this) { isShowProgress ->
+            mbinding.progressBar.visibility = if (isShowProgress) View.VISIBLE else View.GONE
         }
 
         mEditStoreViewModel.getShowFab().observe(this) { isVisible ->
@@ -85,7 +88,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     }
 
     @SuppressLint("CommitTransaction")
-    private fun launchEditFragment(storeEntity: StoreEntity= StoreEntity()) {
+    private fun launchEditFragment(storeEntity: StoreEntity = StoreEntity()) {
 
         mEditStoreViewModel.setShowFab(false)
         mEditStoreViewModel.setStoreSelected(storeEntity)

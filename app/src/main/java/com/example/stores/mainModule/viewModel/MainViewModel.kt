@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.stores.common.entities.StoreEntity
+import com.example.stores.common.utils.Constans
 import com.example.stores.mainModule.model.mainInteractor
 
 class MainViewModel : ViewModel() {
@@ -13,17 +14,24 @@ class MainViewModel : ViewModel() {
     private var storeslists: MutableList<StoreEntity> = mutableListOf()
 
 
-    private val storesList: MutableLiveData<List<StoreEntity>> by lazy {
+    private val showProgress: MutableLiveData<Boolean> = MutableLiveData()
 
-        MutableLiveData<List<StoreEntity>>()
+    fun isShowProgress():MutableLiveData<Boolean> {
+        return showProgress
+    }
+
+
+    private val storesList: MutableLiveData<MutableList<StoreEntity>> by lazy {
+
+        MutableLiveData<MutableList<StoreEntity>>().also {
+            loadStores()//Inicializamos la variable "storesList" y al mismo tiempo inicializamos "loadStores"
+        }
     }
 
     // crear una funcion que puede accesar a este valor
     //No recibe parametro pero devuelve un dato de LiveData configurado de la misma manera que "Stores"
-    fun getStores(): LiveData<List<StoreEntity>> {
-        return storesList.also {//Inicializamos la variable "storesList" y al mismo tiempo inicializamos "loadStores"
-            loadStores()
-        }
+    fun getStores(): LiveData<MutableList<StoreEntity>> {
+        return storesList
     }
 
     // Se crea una funcion que pueda alimentar ese arreglo
@@ -34,13 +42,17 @@ class MainViewModel : ViewModel() {
 //            }
 //        })
 
+        showProgress.value = Constans.SHOW
+
         interactor.getStores {
+            showProgress.value = Constans.HIDE
             storesList.postValue(it)
             storeslists = it
         }
     }
-     fun deleteStore(storeEntity: StoreEntity){
-        interactor.deleteStore(storeEntity){
+
+    fun deleteStore(storeEntity: StoreEntity) {
+        interactor.deleteStore(storeEntity) {
             val index = storeslists.indexOf(storeEntity)
             if (index != -1) {
                 storeslists.removeAt(index)
@@ -48,12 +60,13 @@ class MainViewModel : ViewModel() {
             }
         }
     }
-    fun updateStore(storeEntity: StoreEntity){
+
+    fun updateStore(storeEntity: StoreEntity) {
         storeEntity.isFavorite = !storeEntity.isFavorite
-        interactor.updateStore(storeEntity){
+        interactor.updateStore(storeEntity) {
             val index = storeslists.indexOf(storeEntity)
             if (index != -1) {
-                storeslists[index]= storeEntity
+                storeslists[index] = storeEntity
                 storesList.postValue(storeslists)
             }
         }
