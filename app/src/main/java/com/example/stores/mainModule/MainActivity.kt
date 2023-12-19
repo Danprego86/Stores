@@ -20,6 +20,7 @@ import com.example.stores.databinding.ActivityMainBinding
 import com.example.stores.editModule.viewModel.editStoreViewModel
 import com.example.stores.mainModule.adapter.OnClickListener
 import com.example.stores.mainModule.adapter.StoreAdapter
+import com.example.stores.mainModule.adapter.StoreListAdapter
 import com.example.stores.mainModule.viewModel.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -27,7 +28,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class MainActivity : AppCompatActivity(), OnClickListener {
 
     private lateinit var mbinding: ActivityMainBinding
-    private lateinit var mAdapter: StoreAdapter
+
+    // private lateinit var mAdapter: StoreAdapter
+    private lateinit var mAdapter: StoreListAdapter
     private lateinit var mGridLayout: GridLayoutManager
 
     //MVVM
@@ -64,7 +67,9 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         mEditStoreViewModel = ViewModelProvider(this)[editStoreViewModel::class.java]
 
         mMainViewModel.getStores().observe(this) { stores ->
-            mAdapter.setStores(stores as MutableList<StoreEntity>)
+            //mAdapter.setStores(stores as MutableList<StoreEntity>)
+            mbinding.progressBar.visibility= View.GONE
+            mAdapter.submitList(stores)
         }
 
         mMainViewModel.isShowProgress().observe(this) { isShowProgress ->
@@ -79,10 +84,10 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                 mbinding.fab.hide()
             }
         }
-        mEditStoreViewModel.getStoreSelected().observe(this) {
-
-            mAdapter.add(it)
-        }
+//        mEditStoreViewModel.getStoreSelected().observe(this) {
+//
+//            mAdapter.add(it)
+//        }
 
 
     }
@@ -103,7 +108,8 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     }
 
     private fun setupRecyclerView() {
-        mAdapter = StoreAdapter(mutableListOf(), this)
+       // mAdapter = StoreAdapter(mutableListOf(), this)
+        mAdapter = StoreListAdapter( this)
         mGridLayout = GridLayoutManager(this, resources.getInteger(R.integer.main_columns))
         //getStore()
         mbinding.recyclerView.apply {

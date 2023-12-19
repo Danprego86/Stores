@@ -9,6 +9,8 @@ import com.example.stores.editModule.model.editStoreInteractor
 
 class editStoreViewModel : ViewModel() {
 
+    private var storeId: Long = 0
+
     private val storeSelected = MutableLiveData<StoreEntity>()
     private val showFab = MutableLiveData<Boolean>()
     private val result = MutableLiveData<Any>()
@@ -17,11 +19,12 @@ class editStoreViewModel : ViewModel() {
 
 
     fun setStoreSelected(storeEntity: StoreEntity) {
-        storeSelected.postValue(storeEntity)
+        storeId= storeEntity.id
+       // storeSelected.postValue(storeEntity)
     }
 
     fun getStoreSelected(): LiveData<StoreEntity> {
-        return storeSelected
+        return interactor.getStoreById(storeId)
     }
 
     fun setShowFab(isVisible: Boolean) {
@@ -40,12 +43,13 @@ class editStoreViewModel : ViewModel() {
         return result
     }
 
-    fun saveStore(storeEntity: StoreEntity){
+    fun saveStore(storeEntity: StoreEntity) {
         interactor.saveStore(storeEntity) { newId ->
             result.postValue(newId)
         }
     }
-    fun updateStores(storeEntity: StoreEntity){
+
+    fun updateStores(storeEntity: StoreEntity) {
         interactor.updateStore(storeEntity) { storeUpdated ->
             result.postValue(storeUpdated)
         }

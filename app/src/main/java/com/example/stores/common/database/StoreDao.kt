@@ -1,5 +1,6 @@
 package com.example.stores.common.database
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -12,10 +13,10 @@ import com.example.stores.common.entities.StoreEntity
 interface StoreDao {
 
     @Query("SELECT *FROM StoresEntity")
-    fun getAllStores():MutableList<StoreEntity>
+    fun getAllStores(): LiveData<MutableList<StoreEntity>>
 
     @Query("SELECT * FROM StoresEntity WHERE id = :id")
-    fun getStoreById(id:Long): StoreEntity
+    fun getStoreById(id:Long): LiveData<StoreEntity>
 
     @Insert
     fun addStore(storeEntity: StoreEntity):Long

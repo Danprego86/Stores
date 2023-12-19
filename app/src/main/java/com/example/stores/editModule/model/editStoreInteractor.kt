@@ -1,9 +1,15 @@
 package com.example.stores.editModule.model
 
+import androidx.lifecycle.LiveData
 import com.example.stores.StoreApplication
 import com.example.stores.common.entities.StoreEntity
 
 class editStoreInteractor {
+
+    fun getStoreById(id:Long):LiveData<StoreEntity>{
+        return  StoreApplication.database.storeDao().getStoreById(id)
+
+    }
 
     fun saveStore(storeEntity: StoreEntity, callback: (Long) -> Unit){
 
