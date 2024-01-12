@@ -98,25 +98,30 @@ class mainInteractor {
     val stores: LiveData<MutableList<StoreEntity>> = liveData {
         delay(1000)
         val storeLiveData = StoreApplication.database.storeDao().getAllStores()
-        emitSource(storeLiveData.map {stores->
+        emitSource(storeLiveData.map { stores ->
             stores.sortedBy { it.name }.toMutableList()
 
         })
     }
 
-    fun deleteStore(storeEntity: StoreEntity, callback: (StoreEntity) -> Unit) {
+    suspend fun deleteStore(storeEntity: StoreEntity) {
+        delay(1_500)
+        StoreApplication.database.storeDao().deleteStore(storeEntity)
 
-        Thread {
-            StoreApplication.database.storeDao().deleteStore(storeEntity)
-            callback(storeEntity)//pasarle el estado
-        }.start()
+//        Thread {
+//            StoreApplication.database.storeDao().deleteStore(storeEntity)
+//            callback(storeEntity)//pasarle el estado
+//        }.start()
     }
 
-    fun updateStore(storeEntity: StoreEntity, callback: (StoreEntity) -> Unit) {
+    suspend fun updateStore(storeEntity: StoreEntity) {
 
-        Thread {
-            StoreApplication.database.storeDao().updateStore(storeEntity)
-            callback(storeEntity)//pasarle el estado
-        }.start()
+        delay(300)
+        StoreApplication.database.storeDao().updateStore(storeEntity)
+
+//        Thread {
+//       StoreApplication.database.storeDao().updateStore(storeEntity)
+//            callback(storeEntity)//pasarle el estado
+//        }.start()
     }
 }

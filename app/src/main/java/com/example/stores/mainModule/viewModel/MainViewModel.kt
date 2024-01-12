@@ -3,9 +3,12 @@ package com.example.stores.mainModule.viewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.stores.common.entities.StoreEntity
 import com.example.stores.common.utils.Constans
 import com.example.stores.mainModule.model.mainInteractor
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
@@ -54,23 +57,52 @@ class MainViewModel : ViewModel() {
 
 
     fun deleteStore(storeEntity: StoreEntity) {
-        interactor.deleteStore(storeEntity) {
-            val index = storeslists.indexOf(storeEntity)
-            if (index != -1) {
-                storeslists.removeAt(index)
-               // storesList.postValue(storeslists)
-            }
-        }
+
+//        viewModelScope.launch {
+//            interactor.deleteStore(storeEntity)
+//        }
+        executeAction {interactor.deleteStore(storeEntity)}
+
+
+//        interactor.deleteStore(storeEntity) {
+//            val index = storeslists.indexOf(storeEntity)
+//            if (index != -1) {
+//                storeslists.removeAt(index)
+//               // storesList.postValue(storeslists)
+//            }
+//        }
     }
 
     fun updateStore(storeEntity: StoreEntity) {
+
         storeEntity.isFavorite = !storeEntity.isFavorite
-        interactor.updateStore(storeEntity) {
-            val index = storeslists.indexOf(storeEntity)
-            if (index != -1) {
-                storeslists[index] = storeEntity
-              //  storesList.postValue(storeslists)
+        executeAction { interactor.updateStore(storeEntity) }
+
+//         {
+//            val index = storeslists.indexOf(storeEntity)
+//            if (index != -1) {
+//                storeslists[index] = storeEntity
+//              //  storesList.postValue(storeslists)
+//            }
+//        }
+    }
+
+
+    private fun executeAction(block: suspend ()-> Unit): Job{
+
+        return viewModelScope.launch {
+            showProgress.value= Constans.SHOW
+            try {
+                block()
+                /*storeEntity.isFavorite = !storeEntity.isFavorite // block reemplaza esta parte de codigo
+                interactor.updateStore(storeEntity)*/
+            }catch (e:Exception){
+                e.printStackTrace()
+            }finally {
+                showProgress.value = Constans.HIDE
             }
+
         }
     }
+
 }

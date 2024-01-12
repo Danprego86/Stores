@@ -50,8 +50,11 @@ dependencies {
     implementation 'com.google.android.material:material:1.6.0-alpha01'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
-    //voley
+    //volley
     implementation 'com.android.volley:volley:1.2.1'
+
+    //viewModel
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
 
     //Gson
     implementation 'com.google.code.gson:gson:2.10.1'
@@ -61,6 +64,9 @@ dependencies {
 
     //
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
+
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation "androidx.room:room-ktx:$room_version"
 
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
