@@ -4,6 +4,7 @@ enum class TypeError {
     GET,
     INSERT,
     UPDATE,
-    DELETE
+    DELETE,
+    NONE
 
 }

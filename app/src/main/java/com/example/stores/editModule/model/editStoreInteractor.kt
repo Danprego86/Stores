@@ -1,31 +1,37 @@
 package com.example.stores.editModule.model
 
+import android.database.sqlite.SQLiteConstraintException
 import androidx.lifecycle.LiveData
 import com.example.stores.StoreApplication
 import com.example.stores.common.entities.StoreEntity
+import com.example.stores.common.utils.StoreExceptions
+import com.example.stores.common.utils.TypeError
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
 
 class editStoreInteractor {
-
-    fun getStoreById(id:Long):LiveData<StoreEntity>{
-        return  StoreApplication.database.storeDao().getStoreById(id)
-
+    fun getStoreById(id: Long): LiveData<StoreEntity> {
+        return StoreApplication.database.storeDao().getStoreById(id)
     }
 
-    fun saveStore(storeEntity: StoreEntity, callback: (Long) -> Unit){
+    suspend fun saveStore(storeEntity: StoreEntity) = withContext(Dispatchers.IO) {
 
-        Thread {
-            val newId = StoreApplication.database.storeDao().addStore(storeEntity)// se añade eñ "store.id" para notificar los cambios de favoritos
-           // StoreApplication.database.storeDao().deleteStore(storeEntity)
-            callback(newId)//pasarle el estado
-        }.start()
+        try {
+            StoreApplication.database.storeDao().addStore(storeEntity)
+        } catch (e: SQLiteConstraintException) {
+
+            StoreExceptions(TypeError.INSERT)
+        }
     }
 
-    fun updateStore(storeEntity: StoreEntity, callback: (StoreEntity) -> Unit){
+    suspend fun updateStore(storeEntity: StoreEntity) = withContext(Dispatchers.IO) {
 
-//        Thread {
-//            StoreApplication.database.storeDao().updateStore(storeEntity)// se añade eñ "store.id" para notificar los cambios de favoritos
-//            StoreApplication.database.storeDao().deleteStore(storeEntity)
-//            callback(storeEntity)//pasarle el estado
-//        }.start()
+        try {
+            StoreApplication.database.storeDao().addStore(storeEntity)
+        } catch (e: SQLiteConstraintException) {
+
+            StoreExceptions(TypeError.UPDATE)
+        }
     }
 }

@@ -3,6 +3,15 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="color_white_t">#CCFFFFFF</color>
+
+    <color name="primaryLightColor">#52C7B8</color>
+    <color name="primaryColor">#009688</color>
+    <color name="primaryDarkColor">#00675B</color>
+
+    <color name="secondaryLightColor">#FF867F</color>
+    <color name="secondaryColor">#FF1744</color>
+    <color name="secondaryDarkColor">#C4001D</color>
+
     <color name="color_link">#0D47A1</color>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>

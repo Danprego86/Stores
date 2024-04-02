@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.stores.R
 import com.example.stores.common.entities.StoreEntity
+import com.example.stores.common.utils.TypeError
 import com.example.stores.databinding.FragmentEditStoreBinding
 import com.example.stores.editModule.viewModel.editStoreViewModel
 import com.example.stores.mainModule.MainActivity
@@ -30,6 +31,7 @@ import com.google.android.material.textfield.TextInputLayout
 class EditStoreFragment : Fragment() {
 
     private lateinit var mBinding: FragmentEditStoreBinding
+
     //MVVM
     private lateinit var mEditStoreViewModel: editStoreViewModel
 
@@ -40,7 +42,8 @@ class EditStoreFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mEditStoreViewModel = ViewModelProvider(requireActivity()).get(editStoreViewModel::class.java)
+        mEditStoreViewModel =
+            ViewModelProvider(requireActivity()).get(editStoreViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -76,30 +79,36 @@ class EditStoreFragment : Fragment() {
             hideKeyboard()
 
             when (result) {
-
-                is Long -> {
-                    // mActivity?.addStore(this)// indica al Main Activity la nueva tienda
-                    mStoreEntity.id = result
-                    mEditStoreViewModel.setStoreSelected(mStoreEntity)
-                    Toast.makeText(
-                        mActivity,
-                        R.string.edit_store_message_save_succes,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    requireActivity().onBackPressedDispatcher.onBackPressed()// Despues de guardar la tienda regresa al home
-                }
-
                 is StoreEntity -> {
                     //mActivity?.updateStore(mStoreEntity!!)
+                    val msgRes =
+                        if (result.id == 0L) R.string.edit_store_message_save_succes else R.string.edit_store_message_update_succes
                     mEditStoreViewModel.setStoreSelected(mStoreEntity)
                     Snackbar.make(
                         mBinding.root,
-                        R.string.edit_store_message_update_succes,
+                        msgRes,
                         Snackbar.LENGTH_SHORT
                     ).show()
+                    requireActivity().onBackPressedDispatcher.onBackPressed()// Despues de guardar la tienda regresa al home
                 }
             }
         }
+
+        mEditStoreViewModel.getTypeError()
+            .observe(viewLifecycleOwner) { typeError ->///Control de errores
+
+                if (typeError != TypeError.NONE) {
+
+                    val msgRes = when (typeError) {
+                        TypeError.GET -> "Error al consultar datos"
+                        TypeError.INSERT -> "Error al insertar"
+                        TypeError.UPDATE -> "Error al actualizar"
+                        TypeError.DELETE -> "Error al eliminar"
+                        else -> "Error desconocido"
+                    }
+                    Snackbar.make(mBinding.root, msgRes, Snackbar.LENGTH_SHORT).show()
+                }
+            }
     }
 
     private fun setupActionBar() {
@@ -138,19 +147,6 @@ class EditStoreFragment : Fragment() {
             .centerCrop()
             .into(mBinding.imgPhoto)
     }
-
-
-//    private fun getStore(id: Long) {
-//        val queue =
-//            LinkedBlockingQueue<StoreEntity?>() // traer un objeto de tipo SoreEntity para rellenar la vista
-//        Thread {
-//            mStoreEntity = StoreApplication.database.storeDao().getStoreById(id)
-//            queue.add(mStoreEntity)
-//        }.start()
-//        queue.take()?.let {// si el resultado no es null realice lo de adentro de let
-//            setUiStore(it)
-//        }
-//    }
 
     private fun setUiStore(it: StoreEntity) {
         with(mBinding) {
@@ -249,27 +245,6 @@ class EditStoreFragment : Fragment() {
         return isvalid
     }
 
-    /* private fun validateFiles(): Boolean {// validacion de los campos ya que hasta el momento los guarda en blanco
-         var isValid = true
-
-         if (mBinding.etPhotoUrl.text.toString().trim().isEmpty()) {
-             mBinding.tilPhotoUrl.error = getString(R.string.helper_required)
-             mBinding.etPhotoUrl.requestFocus() // RequestFocus() indica donde hace falta el campo por llenar
-             isValid = false
-         }
-         if (mBinding.etPhone.text.toString().trim().isEmpty()) {
-             mBinding.tilPhone.error = getString(R.string.helper_required)
-             mBinding.etPhone.requestFocus()
-             isValid = false
-         }
-         if (mBinding.etName.text.toString().trim().isEmpty()) {
-             mBinding.tilName.error = getString(R.string.helper_required)
-             mBinding.etName.requestFocus()
-             isValid = false
-         }
-         return isValid
-     }*/
-
     override fun onDestroyView() {//Metodo para ocultar teclado cuando retrocedemos con la flecha
         hideKeyboard()
         super.onDestroyView()
@@ -278,7 +253,7 @@ class EditStoreFragment : Fragment() {
     private fun hideKeyboard() {//Metodo para ocultar teclado cuando se guarda una tienda
 
         val imm = mActivity?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        if (view != null){
+        if (view != null) {
             imm?.hideSoftInputFromWindow(requireView().windowToken, 0)
         }
 
@@ -286,11 +261,10 @@ class EditStoreFragment : Fragment() {
 
     override fun onDestroy() {
         mActivity?.supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        mActivity?.supportActionBar?.title =
-            getString(R.string.app_name)//Indicamos volver a mostrar el nombre de la app
+        mActivity?.supportActionBar?.title = getString(R.string.app_name)//Indicamos volver a mostrar el nombre de la app
         // mActivity?.hideFab(true)
-        mEditStoreViewModel.setShowFab(true)
         mEditStoreViewModel.setResult(Any())// Se limpiara lo que esta en vewModel
+        mEditStoreViewModel.setTypeError(TypeError.NONE)
         setHasOptionsMenu(false)
         super.onDestroy()
     }

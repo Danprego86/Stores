@@ -97,12 +97,6 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                 mbinding.fab.hide()
             }
         }
-//        mEditStoreViewModel.getStoreSelected().observe(this) {
-//
-//            mAdapter.add(it)
-//        }
-
-
     }
 
     @SuppressLint("CommitTransaction")
@@ -133,18 +127,10 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         }
     }
 
-//    @SuppressLint("SuspiciousIndentation")// se ajusta mejora en MainViewModel
-//    private fun getStore() {
-//
-//        val queue = LinkedBlockingQueue<MutableList<StoreEntity>>()
-//
-//        thread {
-//            val stores = StoreApplication.database.storeDao().getAllStores()
-//            queue.add(stores)
-//        }
-//        mAdapter.setStores(queue.take())
-//
-//    }
+    override fun onBackPressed() {
+        super.onBackPressed()
+        mEditStoreViewModel.setShowFab(true)
+    }
 
     // OnclickLisener
     override fun onClick(storeEntity: StoreEntity) {
@@ -229,23 +215,5 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         }
 
     }
-
-
-//    override fun hideFab(isVisible: Boolean) {
-//        if (isVisible)
-//            mbinding.fab.show()
-//        else {
-//            mbinding.fab.hide()
-//        }
-//    }
-//
-//    override fun addStore(storeEntity: StoreEntity) {// indica al adaptador la nueva tienda añadida
-//        mAdapter.add(storeEntity)
-//
-//    }
-//
-//    override fun updateStore(storeEntity: StoreEntity) {
-//        mAdapter.updateStore(storeEntity)
-//    }
 }
 

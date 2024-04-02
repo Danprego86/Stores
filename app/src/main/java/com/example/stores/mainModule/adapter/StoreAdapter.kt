@@ -28,7 +28,7 @@ class StoreAdapter(
 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val store = stores.get(position)
+        val store = stores[position]
 
         with(holder) {
             setListener(store)

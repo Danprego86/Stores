@@ -43,70 +43,25 @@ class MainViewModel : ViewModel() {
     fun isShowProgress(): MutableLiveData<Boolean> {
         return showProgress
     }
-
-    // Se crea una funcion que pueda alimentar ese arreglo
-//    private fun loadStores() {
-////        interactor.getStoresCallback(object : mainInteractor.StoresCallback{
-////            override fun getStoresCallBack(stores: MutableList<StoreEntity>) {
-////                storesList.postValue(stores)
-////            }
-////        })
-//        showProgress.value = Constans.SHOW
-//
-//        interactor.getStores {
-//            showProgress.value = Constans.HIDE
-//            storesList.postValue(it)
-//            storeslists = it
-//        }
-//    }
-
-
     fun deleteStore(storeEntity: StoreEntity) {
-
-//        viewModelScope.launch {
-//            interactor.deleteStore(storeEntity)
-//        }
         executeAction { interactor.deleteStore(storeEntity) }
-
-
-//        interactor.deleteStore(storeEntity) {
-//            val index = storeslists.indexOf(storeEntity)
-//            if (index != -1) {
-//                storeslists.removeAt(index)
-//               // storesList.postValue(storeslists)
-//            }
-//        }
     }
 
     fun updateStore(storeEntity: StoreEntity) {
-
         storeEntity.isFavorite = !storeEntity.isFavorite
         executeAction { interactor.updateStore(storeEntity) }
 
-//         {
-//            val index = storeslists.indexOf(storeEntity)
-//            if (index != -1) {
-//                storeslists[index] = storeEntity
-//              //  storesList.postValue(storeslists)
-//            }
-//        }
     }
-
-
     private fun executeAction(block: suspend () -> Unit): Job {
-
         return viewModelScope.launch {
             showProgress.value = Constans.SHOW
             try {
                 block()
-                /*storeEntity.isFavorite = !storeEntity.isFavorite // block reemplaza esta parte de codigo
-                interactor.updateStore(storeEntity)*/
             } catch (e: StoreExceptions) {
                 typeError.value= e.typeError
             } finally {
                 showProgress.value = Constans.HIDE
             }
-
         }
     }
 
